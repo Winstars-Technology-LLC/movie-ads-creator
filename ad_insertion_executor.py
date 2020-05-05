@@ -3,12 +3,17 @@ import cv2 as cv
 import time
 import numpy as np
 import os
-import ffmpeg
 
 
 def add_audio(video_path):
+    """
+    Extract audio file from input video and add it to output video
+    :param video_path: video path
+    :return: output video name
+    """
+    input_video_name = video_path.split('/')[-1].split('.')[0]
     os.system('ffmpeg -i {} -vn -acodec copy files/output-audio.aac'.format(video_path))
-    output = 'output.avi'
+    output = 'output_{}_.avi'.format(input_video_name)
     os.system('ffmpeg -i files/result.avi -i files/output-audio.aac -codec copy -shortest {}'.format(output))
     return output
 
@@ -19,7 +24,7 @@ def ad_insertion_executor(video_path, logo, config):
     :param video_path: video path
     :param logo: logo path
     :param config: config path
-    :return:
+    :return: output video name
     """
     capture = cv.VideoCapture(video_path)
     frame_width = int(capture.get(3))
@@ -67,12 +72,3 @@ def ad_insertion_executor(video_path, logo, config):
     capture.release()
     out.release()
     return output
-
-
-'''
-film_path = 'SET FILM NAME'
-logo_path = 'SET LOGO NAME'
-config_path = 'models/configurations/configurations.yml'
-
-ad_insertion_executor(film_path, logo_path, config_path, report)
-'''
