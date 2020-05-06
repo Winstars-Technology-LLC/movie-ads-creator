@@ -1,6 +1,5 @@
 from models.opencv_model.ad_insertion import AdInsertion
 import cv2 as cv
-import time
 import numpy as np
 import os
 
@@ -12,9 +11,11 @@ def add_audio(video_path):
     :return: output video name
     """
     input_video_name = video_path.split('/')[-1].split('.')[0]
-    os.system('ffmpeg -i {} -vn -acodec copy files/output-audio.aac'.format(video_path))
-    output = 'output_{}_.avi'.format(input_video_name)
-    os.system('ffmpeg -i files/result.avi -i files/output-audio.aac -codec copy -shortest {}'.format(output))
+    idx = np.random.randint(0, 10000)
+    audio_name = 'audio_{}_{}.aac'.format(input_video_name, idx)
+    os.system('ffmpeg -i {} -vn -acodec copy files/{}'.format(video_path, audio_name))
+    output = 'output_{}_{}.avi'.format(input_video_name, idx)
+    os.system('ffmpeg -i files/result.avi -i files/{} -codec copy -shortest {}'.format(audio_name, output))
     return output
 
 

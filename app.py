@@ -13,13 +13,10 @@ class AdvApp(Flask):
         super().__init__(*args, **kwargs)
 
         self.root_path = Path.cwd()
-        self.files_path = self.root_path / settings.files_path
-
-        if not self.files_path.exists():
-            self.files_path.mkdir()
 
         self.conf_path = self.root_path / settings.conf_path
         self.default_conf_path = self.root_path / settings.default_conf_path
+
         self.config['model_config'] = self.load_conf()
 
     def load_conf(self) -> dict:
