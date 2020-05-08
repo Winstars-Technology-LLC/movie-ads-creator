@@ -15,5 +15,5 @@ class AbstractAdInsertion(ABC):
         pass
 
     @abstractmethod
-    def insert_ad(self):
+    def insert_ad(self, contours):
         pass
