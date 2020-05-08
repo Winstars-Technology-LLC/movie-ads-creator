@@ -1,8 +1,6 @@
 import cv2 as cv
 import numpy as np
 import math
-import time
-from skimage.exposure import match_histograms
 from models.AbstractAdInsertion import AbstractAdInsertion
 from scipy.spatial import distance
 from scipy.signal import savgol_filter
@@ -155,6 +153,7 @@ class AdInsertion(AbstractAdInsertion):
         :param poly_order: the order of the polynomial used to fit the samples
         :return: stable contours amount
         """
+        print('Detected {} stable contours.'.format(len(self.stable_contours)))
         for field in self.stable_contours:
             for i in range(1, 9):
                 field[:, i] = savgol_filter(field[:, i], window, poly_order)
