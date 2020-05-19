@@ -1,5 +1,6 @@
 #!/bin/bash
-
+sudo apt-get install wget
+sudo dpkg -l | grep wget
 cd ..
 mkdir -p data
 
