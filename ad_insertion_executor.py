@@ -55,7 +55,8 @@ def detection(video_info, config):
     print('Detection is running...')
     ad_insertion = AdInsertion(None, None, None, None, video_info)
     ad_insertion.build_model(config)
-    ad_insertion.detect_surfaces()
+    insertions = ad_insertion.detect_surfaces()
+    print('Detected {} stable contours.'.format(len(insertions)))
     stable_contours = ad_insertion.stable_contours
     print('Detection completed.')
     return stable_contours

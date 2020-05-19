@@ -8,6 +8,4 @@ RUN pip --no-cache-dir install -r requirements.txt
 
 RUN apt-get update && apt-get --assume-yes install ffmpeg
 
-ENTRYPOINT ["python"]
-
-CMD ["app.py"]
+CMD python test_movie_creator.py -v && python app.py

@@ -175,12 +175,13 @@ class AdInsertion(AbstractAdInsertion):
         :param poly_order: the order of the polynomial used to fit the samples
         :return: stable contours amount
         """
-        print('Detected {} stable contours.'.format(len(self.stable_contours)))
+        insertions_amount = self.stable_contours
         for field in self.stable_contours:
             for i in range(1, 9):
                 field[:, i] = savgol_filter(field[:, i], window, poly_order)
 
         self.stable_contours = np.array([item for sublist in self.stable_contours for item in sublist])
+        return insertions_amount
 
     def __transform_logo(self, contours):
         """
@@ -232,7 +233,8 @@ class AdInsertion(AbstractAdInsertion):
                              cfg['dst_threshold'])
         self.__define_contour_orientation()
         self.__find_insertion_time_period()
-        self.__smooth_coordinates(cfg['window'], cfg['poly_order'])
+        insertions = self.__smooth_coordinates(cfg['window'], cfg['poly_order'])
+        return insertions
 
     def insert_ad(self, contours):
         """
