@@ -93,12 +93,13 @@ def insertion(video_path, frames_count, logo, video_info,
         capture.release()
         out.release()
         print('Insertion completed.')
+        message = 'Video file has been processed.'
+        print(message)
+
     else:
         message = 'STABLE CONTOURS WITH SPECIFIED TIME PERIOD WERE NOT FOUND.'
         print(message)
 
-    message = 'Video file has been processed.'
-    print(message)
     return message
 
 
