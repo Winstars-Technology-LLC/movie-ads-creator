@@ -23,8 +23,11 @@ To run the mechanism do the following:
 2. Copy the repository URL.
 3. From a terminal window write the command: ```git clone <URL>```, where URl is a copied repository URL.
 
-- From a terminal window type ```cd movie-ads-creator```. Then type ```bash execute.sh```. Wait till the installation will be completed.
-- Now the **data** folder is linked with the Docker container. It means the container has access to the files in this folder and the output video will be written into this folder;
+- From a terminal window type ```cd movie-ads-creator```. Then type ```bash execute.sh```. Wait till the installation will be completed;
+
+- Find the **data** folder in **application**. The **data** folder is linked with the Docker container. It means the container has access to the files in this folder and the output video will be written into this folder. Copy video file and logo into **data** folder;
+
+- All the required applications and frameworks are installed now. To begin working you need to start docker container. To do that type the next command: ```bash run.sh``` . The application is running, follow this link in browser: http://0.0.0.0:80/
 
 - To begin working with application press '**default**'; 
 
@@ -36,5 +39,23 @@ To run the mechanism do the following:
 
 - To handle new video \ logo just copy this video \ logo into the **data** folder and replace new video \ logo name with used one in 'logo_path' \ 'video_path';
 
+- While you are working with the application, all the application logs are recorded in **log_file.log** that located in **data** folder;
 
-- To stop the application press CTRL+С from the terminal window.     
+- To stop the application you need to stop the logs recording and Docker container. Press CTRL+С from the terminal window, then type the following: ```sudo docker container stop dock```;
+
+- Every time when you want to use the application from the terminal window move to the **movie-ads-creator** folder and type ```bash run.sh```. Do not forget to follow this link after the application started: http://0.0.0.0:80/. To stop the application repeat the step below;
+
+- The application runs unit tests every time when developer makes changes in code and commits them to the GitHub repository. This opportunity is realized with Git hooks. If you want to create Git hooks do the following:
+1. Create directory for scripts in Git repository: ```mkdir scripts```.
+2. Use the editor to create scripts/run-test.bash file:
+![Alt text](/Users/oleksandr/Folder/movie_creator/1.png)
+3. Hook the script - create scripts/pre-commit.bash:
+![Alt text](/Users/oleksandr/Folder/movie_creator/2.png)
+4. Install hooks with scripts/install-hooks.bash:
+![Alt text](/Users/oleksandr/Folder/movie_creator/3.png)
+5. Make all scripts executable with the following command: 
+```chmod +x scripts/run-tests.bash scripts/pre-commit.bash scripts/install-hooks.bash ```
+6. Install the hook with the next command: ```./scripts/install-hooks.bash```.
+Now, every time when you will try to create a commit, all tests must pass to allow that.
+
+
