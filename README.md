@@ -23,7 +23,7 @@ To run the mechanism do the following:
 2. Copy the repository URL.
 3. From a terminal window write the command: ```git clone <URL>```, where URl is a copied repository URL.
 
-- From a terminal window type ```cd movie-ads-creator```. Then type ```bash execute.sh```. Wait till the installation will be completed;
+- From a terminal window type ```cd movie_ads_creator```. Then type ```bash execute.sh```. Wait till the installation will be completed;
 
 - Find the **data** folder in **application**. The **data** folder is linked with the Docker container. It means the container has access to the files in this folder and the output video will be written into this folder. Copy video file and logo into **data** folder;
 
@@ -43,7 +43,7 @@ To run the mechanism do the following:
 
 - To stop the application you need to stop the logs recording and Docker container. Press CTRL+С from the terminal window, then type the following: ```sudo docker container stop dock```;
 
-- Every time when you want to use the application from the terminal window move to the **movie-ads-creator** folder and type ```bash run.sh```. Do not forget to follow this link after the application started: http://0.0.0.0:80/. To stop the application repeat the step below;
+- Every time when you want to use the application from the terminal window move to the **movie_ads_creator** folder and type ```bash run.sh```. Do not forget to follow this link after the application started: http://0.0.0.0:80/. To stop the application repeat the step below;
 
 - The application runs unit tests every time when developer makes changes in code and commits them to the GitHub repository. This opportunity is realized with Git hooks. If you want to create Git hooks do the following:
 - Create directory for scripts in Git repository: ```mkdir scripts```.
