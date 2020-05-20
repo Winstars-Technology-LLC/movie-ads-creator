@@ -29,5 +29,7 @@ then
 sudo docker build -t movie_creator:1.0 .
 fi
 
+cd ..
+
 sudo docker run -d -p 80:80 -it --name dock --mount type=bind,source="$(pwd)"/data,target=/app/output movie_creator:1.0
 sudo docker container stop dock
