@@ -3,5 +3,6 @@
 cd "${0%/*}/.." || exit
 cd ..
 
-python test_movie_creator.py
-
+echo "Running tests"
+echo "............................"
+echo "Failed!" && exit 1
