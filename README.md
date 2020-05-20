@@ -46,16 +46,47 @@ To run the mechanism do the following:
 - Every time when you want to use the application from the terminal window move to the **movie-ads-creator** folder and type ```bash run.sh```. Do not forget to follow this link after the application started: http://0.0.0.0:80/. To stop the application repeat the step below;
 
 - The application runs unit tests every time when developer makes changes in code and commits them to the GitHub repository. This opportunity is realized with Git hooks. If you want to create Git hooks do the following:
-1. Create directory for scripts in Git repository: ```mkdir scripts```.
-2. Use the editor to create scripts/run-test.bash file:
-![Alt text](/Users/oleksandr/Folder/movie_creator/1.png)
-3. Hook the script - create scripts/pre-commit.bash:
-![Alt text](/Users/oleksandr/Folder/movie_creator/2.png)
-4. Install hooks with scripts/install-hooks.bash:
-![Alt text](/Users/oleksandr/Folder/movie_creator/3.png)
-5. Make all scripts executable with the following command: 
+- Create directory for scripts in Git repository: ```mkdir scripts```.
+ - Use the editor to create scripts/run-test.bash file:
+```shell script
+#!/usr/bin/env bash
+
+set -e
+
+cd "${0%/*}/.."
+
+# let's fake failing test for now 
+echo "Running tests"
+echo "............................" 
+echo "Failed!" && exit 1
+```
+- Hook the script - create scripts/pre-commit.bash:
+```shell script
+#!/usr/bin/env bash
+
+echo "Running pre-commit hook"
+./scripts/run-tests.bash
+
+# $? stores exit value of the last command
+if [ $? -ne 0 ]; then
+ echo "Tests must pass before commit!"
+ exit 1
+fi
+```
+- Install hooks with scripts/install-hooks.bash:
+```shell script
+#!/usr/bin/env bash
+
+GIT_DIR=$(git rev-parse --git-dir)
+
+echo "Installing hooks..."
+# this command creates symlink to our pre-commit script
+ln -s ../../scripts/pre-commit.bash $GIT_DIR/hooks/pre-commit
+echo "Done!"
+```
+- Make all scripts executable with the following command: 
 ```chmod +x scripts/run-tests.bash scripts/pre-commit.bash scripts/install-hooks.bash ```
-6. Install the hook with the next command: ```./scripts/install-hooks.bash```.
+- Install the hook with the next command: ```./scripts/install-hooks.bash```.
 Now, every time when you will try to create a commit, all tests must pass to allow that.
 
 
