@@ -36,4 +36,5 @@ To run the mechanism do the following:
 
 - To handle new video \ logo just copy this video \ logo into the **data** folder and replace new video \ logo name with used one in 'logo_path' \ 'video_path';
 
+
 - To stop the application press CTRL+С from the terminal window.     
