@@ -7,7 +7,6 @@ conf_serializer = api.model(
         'contour_threshold': fields.Float,
     }
 )
-
 processing_serializer = api.model(
     'Processing',
     {

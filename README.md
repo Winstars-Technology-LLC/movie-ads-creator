@@ -39,7 +39,7 @@ To run the mechanism do the following:
 
 - To handle new video \ logo just copy this video \ logo into the **data** folder and replace new video \ logo name with used one in 'logo_path' \ 'video_path';
 
-- While you are working with the application, all the application logs are recorded in **log_file.log** that located in **data** folder;
+- While you are working with the application, all the application logs are recorded in **log_file.log** that located in **data** folder. When you stop Docker container, the application will stop working and logs recording will be also stopped. So if you want to check application outputs while it is working just open **log_file.log** from your computer;
 
 - To stop the application you need to stop the logs recording and Docker container. Press CTRL+С from the terminal window, then type the following: ```sudo docker container stop dock```;
 
