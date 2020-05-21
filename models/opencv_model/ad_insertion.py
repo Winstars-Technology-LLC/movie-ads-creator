@@ -11,15 +11,17 @@ class AdInsertion(AbstractAdInsertion):
     """
     The model provides advertisement insertion with OpenCV package
     """
-    def __init__(self, frame, logo, frame_idx, data, fps):
+    def __init__(self, frame, logo, frame_idx, data, video_info):
         self.frame = frame
         self.logo = logo
-        self.fps = fps
+        self.fps = video_info['fps']
         self.contours = []
         self.single_cnt = []
         self.stable_contours = []
         self.data = data
         self.frame_idx = frame_idx
+        self.video_name = video_info['video_name']
+        self.square = video_info['frame_square']
         self.config = {}
 
     def __contours_finding(self, kernel, min_area, max_area, corners_count, perimeter_threshold):
@@ -39,7 +41,7 @@ class AdInsertion(AbstractAdInsertion):
         _, contours, __ = cv.findContours(th, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
 
         drop_list = [i for i in range(len(contours))
-                     if cv.contourArea(contours[i]) < min_area
+                     if cv.contourArea(contours[i]) / self.square < min_area
                      or cv.contourArea(contours[i]) > max_area]
         contours = [i for j, i in enumerate(contours) if j not in drop_list]
 
@@ -146,6 +148,26 @@ class AdInsertion(AbstractAdInsertion):
                                     bot_left[0], bot_left[1], bot_right[0],
                                     bot_right[1], top_right[0], top_right[1]])
 
+    def __find_insertion_time_period(self):
+        """
+        Calculate video file time periods with ad insertion
+        :return:
+        """
+
+        if len(self.stable_contours) != 0:
+            with open('output/report_{}.txt'.format(self.video_name), 'w') as report:
+                report.write('Total amount of insertions: {} \n'.format(len(self.stable_contours)))
+                for i, contour in enumerate(self.stable_contours):
+                    report.write('Period {}: \n'.format(i + 1))
+                    begin = int(contour[:, 0][0] / math.ceil(self.fps))
+                    b_time = divmod(begin, 60)
+                    end = math.ceil(contour[:, 0][-1] / math.ceil(self.fps))
+                    e_time = divmod(end, 60)
+                    report.write('BEGIN: {} minutes {} seconds, END: {} minutes {} seconds \n'.format(b_time[0],
+                                                                                                      b_time[1],
+                                                                                                      e_time[0],
+                                                                                                      e_time[1]))
+
     def __smooth_coordinates(self, window, poly_order):
         """
         Smoothing corners coordinated with Savitzky-Golay filter
@@ -153,12 +175,13 @@ class AdInsertion(AbstractAdInsertion):
         :param poly_order: the order of the polynomial used to fit the samples
         :return: stable contours amount
         """
-        print('Detected {} stable contours.'.format(len(self.stable_contours)))
+        insertions_amount = self.stable_contours
         for field in self.stable_contours:
             for i in range(1, 9):
                 field[:, i] = savgol_filter(field[:, i], window, poly_order)
 
         self.stable_contours = np.array([item for sublist in self.stable_contours for item in sublist])
+        return insertions_amount
 
     def __transform_logo(self, contours):
         """
@@ -209,7 +232,9 @@ class AdInsertion(AbstractAdInsertion):
         self.__data_cleaning(cfg['field_threshold'], cfg['contour_threshold'],
                              cfg['dst_threshold'])
         self.__define_contour_orientation()
-        self.__smooth_coordinates(cfg['window'], cfg['poly_order'])
+        self.__find_insertion_time_period()
+        insertions = self.__smooth_coordinates(cfg['window'], cfg['poly_order'])
+        return insertions
 
     def insert_ad(self, contours):
         """
