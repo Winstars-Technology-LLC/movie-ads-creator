@@ -24,7 +24,7 @@ class AdInsertion(AbstractAdInsertion):
         self.square = video_info['frame_square']
         self.config = {}
 
-    def __contours_finding(self, kernel, min_area, max_area, corners_count, perimeter_threshold):
+    def __find_contours(self, kernel, min_area, max_area, corners_count, perimeter_threshold):
         """
         Contours detection in the frame
         :param kernel: parameter for frame bluring
@@ -54,7 +54,7 @@ class AdInsertion(AbstractAdInsertion):
             if convexity and corners == corners_count:
                 self.contours.append(approx.tolist())
 
-    def __data_preprocessed(self):
+    def __create_data_structures(self):
         """
         Writing contours to array
         :return:
@@ -66,7 +66,7 @@ class AdInsertion(AbstractAdInsertion):
                                   v[0][0][0], v[0][0][1], v[1][0][0], v[1][0][1],
                                   v[2][0][0], v[2][0][1], v[3][0][0], v[3][0][1]])
 
-    def __data_cleaning(self, field_threshold, contours_threshold, dst_threshold):
+    def __clean_data(self, field_threshold, contours_threshold, dst_threshold):
         """
         Stable fields and contours detection
         :param field_threshold: minimum field duration threshold
@@ -218,10 +218,10 @@ class AdInsertion(AbstractAdInsertion):
         :return:
         """
         cfg = self.config
-        self.__contours_finding(cfg['kernel'], cfg['min_area_threshold'],
-                                cfg['max_area_threshold'], cfg['corners_count'],
-                                cfg['perimeter_threshold'])
-        self.__data_preprocessed()
+        self.__find_contours(cfg['kernel'], cfg['min_area_threshold'],
+                             cfg['max_area_threshold'], cfg['corners_count'],
+                             cfg['perimeter_threshold'])
+        self.__create_data_structures()
 
     def detect_surfaces(self):
         """
@@ -229,8 +229,8 @@ class AdInsertion(AbstractAdInsertion):
         :return: contours quantity
         """
         cfg = self.config
-        self.__data_cleaning(cfg['field_threshold'], cfg['contour_threshold'],
-                             cfg['dst_threshold'])
+        self.__clean_data(cfg['field_threshold'], cfg['contour_threshold'],
+                          cfg['dst_threshold'])
         self.__define_contour_orientation()
         self.__find_insertion_time_period()
         insertions = self.__smooth_coordinates(cfg['window'], cfg['poly_order'])
