@@ -37,5 +37,5 @@ class ProcessingResource(Resource):
         """ Process new files, return processed video """
 
         payload = request.get_json()
-        message = ad_insertion_executor(payload['video_path'], payload['logo_path'], app.conf_path)
+        message = ad_insertion_executor(payload['video'], payload['logo'], app.conf_path)
         return message

@@ -19,12 +19,11 @@ def add_audio(video_path, filename):
     os.system('ffmpeg -i files/result.avi -i files/{} -codec copy -shortest {}'.format(audio_name, output))
 
 
-def preprocessing(frames_count, capture, logo, video_info, config):
+def preprocessing(frames_count, capture, video_info, config):
     """
     Model preprocessing
     :param frames_count: video frames count
     :param capture: video object
-    :param logo: logo path
     :param video_info: video info
     :param config: config path
     :return:
@@ -34,7 +33,15 @@ def preprocessing(frames_count, capture, logo, video_info, config):
     for i in range(frames_count):
         ret, frame = capture.read()
         if ret:
-            ad_insertion = AdInsertion(frame, logo, i, data, video_info)
+
+            if i == int(frames_count * 0.25):
+                print('25% of the preprocessing is completed.')
+            if i == int(frames_count * 0.5):
+                print('50% of the preprocessing is completed.')
+            if i == int(frames_count * 0.75):
+                print('75% of the preprocessing is completed.')
+
+            ad_insertion = AdInsertion(frame, None, i, data, video_info)
             ad_insertion.build_model(config)
             ad_insertion.data_preprocessed()
         else:
@@ -82,6 +89,14 @@ def insertion(video_path, frames_count, logo, video_info,
         for i in range(frames_count):
             ret, frame = capture.read()
             if ret:
+
+                if i == int(frames_count * 0.25):
+                    print('25% of the insertion is completed.')
+                if i == int(frames_count * 0.5):
+                    print('50% of the insertion is completed.')
+                if i == int(frames_count * 0.75):
+                    print('75% of the insertion is completed.')
+
                 if i in stable_contours[:, 0]:
                     ad_insertion = AdInsertion(frame, logo, i, None, video_info)
                     ad_insertion.build_model(config)
@@ -103,22 +118,22 @@ def insertion(video_path, frames_count, logo, video_info,
     return message
 
 
-def ad_insertion_executor(video_path, logo, config):
+def ad_insertion_executor(video, logo, config):
     """
     Execute AdInsertion model for logo insertion
-    :param video_path: video path
-    :param logo: logo path
+    :param video: video name
+    :param logo: logo name
     :param config: config path
     :return: message that describes insertion result
     """
-    input_video_name = video_path.split('/')[-1].split('.')[0]
+    input_video_name = video.split('.')[0]
     files_path = str(Path.cwd()) + '/files'
     output_path = str(Path.cwd()) + '/output'
     Path(files_path).mkdir(parents=True, exist_ok=True)
     Path(output_path).mkdir(parents=True, exist_ok=True)
-    capture = cv.VideoCapture(video_path)
+    capture = cv.VideoCapture(output_path + '/' + video)
 
-    if int(capture.get(cv.CAP_PROP_FPS)) == 0 or cv.imread(logo) is None:
+    if int(capture.get(cv.CAP_PROP_FPS)) == 0 or cv.imread(output_path + '/' + logo) is None:
         message = 'ERROR WHILE ENTERING LOGO OR VIDEO PATH.'
         print(message)
     else:
@@ -135,13 +150,14 @@ def ad_insertion_executor(video_path, logo, config):
                       'frame_square': frame_square}
 
         # Preprocessing
-        preprocessing(frames_count, capture, logo, video_info, config)
+        preprocessing(frames_count, capture, video_info, config)
 
         # Detection
         stable_contours = detection(video_info, config)
 
         # Ads insertion
-        message = insertion(video_path, frames_count, logo, video_info,
+        message = insertion(output_path + '/' + video, frames_count,
+                            output_path + '/' + logo, video_info,
                             config, stable_contours, out, input_video_name)
 
     for filename in os.listdir(files_path):

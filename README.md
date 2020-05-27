@@ -35,9 +35,9 @@ To run the mechanism do the following:
 
 - If you want to check current model configuration, choose '**Get**' method (Get current model configuration), and click '**Try it out**';
 
-- To insert the ad into video choose '**POST**' method, click '**Try it out**', replace **'string'** in front of **'logo_path'** and **'video_path'** with the next paths: **/app/output/logo_name**, **/app/output/video_file_name**, where logo_name and video_file_name are the actual logo and video names from **data** folder. Click '**Execute**'. After execution you will see the model response "Video file has been processed.". If the model insert ads into the input video, the output video and report will appear in **data** folder;
+- To insert the ad into video choose '**POST**' method, click '**Try it out**', replace **string** in front of **'logo'** and **'video'** with the logo and video file names from **data** folder respectively. Click '**Execute**'. After execution you will see the model response "Video file has been processed.". If the model insert ads into the input video, the output video and report will appear in **data** folder;
 
-- To handle new video \ logo just copy this video \ logo into the **data** folder and replace new video \ logo name with used one in 'logo_path' \ 'video_path';
+- To handle new video \ logo just copy this video \ logo into the **data** folder and replace new video \ logo name with used one in 'logo' \ 'video';
 
 - While you are working with the application, all the application logs are recorded in **log_file.log** that located in **data** folder. When you stop Docker container, the application will stop working and logs recording will be also stopped. So if you want to check application outputs while it is working just open **log_file.log** from your computer;
 
