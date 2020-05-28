@@ -22,6 +22,7 @@ class AdInsertion(AbstractAdInsertion):
         self.frame_idx = frame_idx
         self.video_name = video_info['video_name']
         self.square = video_info['frame_square']
+        self.logo_ratio = video_info['logo_ratio']
         self.config = {}
 
     def __find_contours(self, kernel, min_area, max_area, corners_count, perimeter_threshold):
@@ -91,35 +92,36 @@ class AdInsertion(AbstractAdInsertion):
             condition = np.logical_and(data[:, 0] >= interval[0], data[:, 0] <= interval[1])
             stable = data[condition]
 
-            prev_cnt = stable[0, :]
-            prev_contour = np.array([[prev_cnt[1], prev_cnt[2]], [prev_cnt[3], prev_cnt[4]],
-                                     [prev_cnt[5], prev_cnt[6]], [prev_cnt[7], prev_cnt[8]]])
-            prev_m = cv.moments(prev_contour)
-            prev_cx = int(prev_m['m10'] / prev_m['m00'])
-            prev_cy = int(prev_m['m01'] / prev_m['m00'])
-            stable_contour = []
-            for i, row in enumerate(stable):
+            if len(stable) != 0:
+                prev_cnt = stable[0, :]
+                prev_contour = np.array([[prev_cnt[1], prev_cnt[2]], [prev_cnt[3], prev_cnt[4]],
+                                         [prev_cnt[5], prev_cnt[6]], [prev_cnt[7], prev_cnt[8]]])
+                prev_m = cv.moments(prev_contour)
+                prev_cx = int(prev_m['m10'] / prev_m['m00'])
+                prev_cy = int(prev_m['m01'] / prev_m['m00'])
+                stable_contour = []
+                for i, row in enumerate(stable):
 
-                if row[0] - prev_cnt[0] == 0:
-                    continue
+                    if row[0] - prev_cnt[0] == 0:
+                        continue
 
-                elif row[0] - prev_cnt[0] == 1:
-                    contour = np.array([[row[1], row[2]], [row[3], row[4]],
-                                        [row[5], row[6]], [row[7], row[8]]])
+                    elif row[0] - prev_cnt[0] == 1:
+                        contour = np.array([[row[1], row[2]], [row[3], row[4]],
+                                            [row[5], row[6]], [row[7], row[8]]])
 
-                    m = cv.moments(contour)
-                    base_cx = int(m['m10'] / m['m00'])
-                    base_cy = int(m['m01'] / m['m00'])
+                        m = cv.moments(contour)
+                        base_cx = int(m['m10'] / m['m00'])
+                        base_cy = int(m['m01'] / m['m00'])
 
-                    dist = distance.euclidean([base_cx, base_cy], [prev_cx, prev_cy])
-                    if dist < dst_threshold:
-                        stable_contour.append(row)
-                        prev_cnt = row
-                        prev_cx = base_cx
-                        prev_cy = base_cy
+                        dist = distance.euclidean([base_cx, base_cy], [prev_cx, prev_cy])
+                        if dist < dst_threshold:
+                            stable_contour.append(row)
+                            prev_cnt = row
+                            prev_cx = base_cx
+                            prev_cy = base_cy
 
-            if len(stable_contour) >= int(self.fps) * contours_threshold:
-                self.stable_contours.append(np.array(stable_contour))
+                if len(stable_contour) >= int(self.fps) * contours_threshold:
+                    self.stable_contours.append(np.array(stable_contour))
 
     def __define_contour_orientation(self):
         """

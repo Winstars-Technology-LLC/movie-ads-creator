@@ -7,7 +7,7 @@ To insert ads you need to have the following:
 - The video file for ad insertion;
 
 The mechanism's main properties as follows:
-- Detect stable contours in video using image threshold;
+- Detect contours in video using image threshold;
 - Find stable contours among existing;
 - Insert ad into detected contours;
 - Extract audio track from input video and add it to the output.

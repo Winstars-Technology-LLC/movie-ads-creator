@@ -13,7 +13,7 @@ def add_audio(video_path, filename):
     :return: output video name
     """
     idx = np.random.randint(0, 10000)
-    audio_name = 'audio_{}_{}.aac'.format(filename, idx)
+    audio_name = 'audio_{}_{}.m4a'.format(filename, idx)
     os.system('ffmpeg -i {} -vn -acodec copy files/{}'.format(video_path, audio_name))
     output = 'output/output_{}_{}.avi'.format(filename, idx)
     os.system('ffmpeg -i files/result.avi -i files/{} -codec copy -shortest {}'.format(audio_name, output))
@@ -132,8 +132,9 @@ def ad_insertion_executor(video, logo, config):
     Path(files_path).mkdir(parents=True, exist_ok=True)
     Path(output_path).mkdir(parents=True, exist_ok=True)
     capture = cv.VideoCapture(output_path + '/' + video)
+    read_logo = cv.imread(output_path + '/' + logo)
 
-    if int(capture.get(cv.CAP_PROP_FPS)) == 0 or cv.imread(output_path + '/' + logo) is None:
+    if int(capture.get(cv.CAP_PROP_FPS)) == 0 or read_logo is None:
         message = 'ERROR WHILE ENTERING LOGO OR VIDEO PATH.'
         print(message)
     else:
@@ -145,9 +146,12 @@ def ad_insertion_executor(video, logo, config):
         fps = capture.get(cv.CAP_PROP_FPS)
         out_name = 'files/result.avi'
         out = cv.VideoWriter(out_name, four_cc, fps, (frame_width, frame_height), True)
+        logo_h, logo_w, _ = read_logo.shape
+        logo_ratio = logo_h / logo_w
         video_info = {'fps': fps,
                       'video_name': input_video_name,
-                      'frame_square': frame_square}
+                      'frame_square': frame_square,
+                      'logo_ratio': logo_ratio}
 
         # Preprocessing
         preprocessing(frames_count, capture, video_info, config)
@@ -157,7 +161,7 @@ def ad_insertion_executor(video, logo, config):
 
         # Ads insertion
         message = insertion(output_path + '/' + video, frames_count,
-                            output_path + '/' + logo, video_info,
+                            read_logo, video_info,
                             config, stable_contours, out, input_video_name)
 
     for filename in os.listdir(files_path):
