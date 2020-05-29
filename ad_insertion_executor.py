@@ -151,7 +151,8 @@ def ad_insertion_executor(video, logo, config):
         video_info = {'fps': fps,
                       'video_name': input_video_name,
                       'frame_square': frame_square,
-                      'logo_ratio': logo_ratio}
+                      'logo_ratio': logo_ratio,
+                      'frames_count': frames_count}
 
         # Preprocessing
         preprocessing(frames_count, capture, video_info, config)
@@ -161,7 +162,7 @@ def ad_insertion_executor(video, logo, config):
 
         # Ads insertion
         message = insertion(output_path + '/' + video, frames_count,
-                            read_logo, video_info,
+                            output_path + '/' + logo, video_info,
                             config, stable_contours, out, input_video_name)
 
     for filename in os.listdir(files_path):
