@@ -3,13 +3,14 @@
 _Mechanism for ads insertion based on OpenCV package._
 
 To insert ads you need to have the following:
-- The logo to insert. **Preferable formats are .png, .jpg**;
+- The logo to insert. **Preferable format is .png**. **Please notice** that if the logo contain a background, the insertion will also contain the logo background;
 - The video file for ad insertion;
 
 The mechanism's main properties as follows:
-- Detect stable contours in video using image threshold;
+- Detect contours in video using image threshold;
 - Find stable contours among existing;
-- Insert ad into detected contours;
+- Prepare the instance insertions and suggest user to check them;
+- Insert ads into detected contours;
 - Extract audio track from input video and add it to the output.
 
 To run the mechanism do the following:
@@ -31,15 +32,16 @@ To run the mechanism do the following:
 
 - To begin working with application press '**default**'; 
 
+- While you are working with the application, all the application logs are recorded in **log_file.log** that located in **data** folder. When you stop Docker container, the application will stop working and logs recording will be also stopped. So if you want to check application outputs while it is working just open **log_file.log** from your computer;
+
 - There is an opportunity to set preferable minimum time period for appearing unique logo in video. By default each logo will appear not less than 1.5 seconds. To change time period click '**Put**' method (Update model configuration), click '**Try it out**' and set parameter contour_threshold to the desired value, after that press '**Execute**';
 
-- If you want to check current model configuration, choose '**Get**' method (Get current model configuration), and click '**Try it out**';
+- If you want to check current model configuration, choose '**Get**' method (Get Current Model Configuration), and click '**Try it out**';
 
-- To insert the ad into video choose '**POST**' method, click '**Try it out**', replace **'string'** in front of **'logo_path'** and **'video_path'** with the next paths: **/app/output/logo_name**, **/app/output/video_file_name**, where logo_name and video_file_name are the actual logo and video names from **data** folder. Click '**Execute**'. After execution you will see the model response "Video file has been processed.". If the model insert ads into the input video, the output video and report will appear in **data** folder;
+- **To insert advertisement into the video file do the following:**
+1. Run **Video Preprocessing** - choose '**POST**' method, click '**Try it out**', replace **string** in front of **'logo'** and **'video'** with the logo and video file names from **data** folder respectively. Click '**Execute**'. Wait the the execution will be finished. If the execution was successful, you will get instance insertions in **data** folder. You need to check the instances and if you do not like the instance just delete it from the folder.
 
-- To handle new video \ logo just copy this video \ logo into the **data** folder and replace new video \ logo name with used one in 'logo_path' \ 'video_path';
-
-- While you are working with the application, all the application logs are recorded in **log_file.log** that located in **data** folder. When you stop Docker container, the application will stop working and logs recording will be also stopped. So if you want to check application outputs while it is working just open **log_file.log** from your computer;
+2. Run **Advertisement Insertion** - after the instances checking choose '**GET**' method (**Advertisement Insertion**), click '**Try it out**' and '**Execute**'. Wait till the execution will be finished and check the output video file, report and logs in **data** folder.
 
 - To stop the application you need to stop the logs recording and Docker container. Press CTRL+С from the terminal window, then type the following: ```sudo docker container stop dock```;
 

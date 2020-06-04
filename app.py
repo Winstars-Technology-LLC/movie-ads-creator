@@ -31,6 +31,7 @@ class AdvApp(Flask):
 
 
 app = AdvApp(__name__)
+app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 api = Api(app, title='Advertisement REST API', validate=True)
 
 from src.views import *

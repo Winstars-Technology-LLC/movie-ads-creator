@@ -22,6 +22,9 @@ class AdInsertion(AbstractAdInsertion):
         self.frame_idx = frame_idx
         self.video_name = video_info['video_name']
         self.square = video_info['frame_square']
+        self.logo_ratio = video_info['logo_ratio']
+        self.frames_count = video_info['frames_count']
+        self.instance_insertions = []
         self.config = {}
 
     def __find_contours(self, kernel, min_area, max_area, corners_count, perimeter_threshold):
@@ -76,16 +79,16 @@ class AdInsertion(AbstractAdInsertion):
         """
         data = np.load('files/data.npy')
         unique_idx = np.unique(data[:, 0])
-        first_frame = unique_idx[0]
-        last_frame = unique_idx[-1]
-        nums = set(unique_idx)
-        expected = [i if i in nums else 'X' for i in range(first_frame, last_frame + 1)]
+        expected = [i if i in unique_idx else 'X' for i in range(self.frames_count)]
         x_ids = [i for i, j in enumerate(expected) if j == 'X']
         intervals = [[x_ids[i] + 1, x_ids[i + 1] - 1] for i in range(len(x_ids) - 1)
                      if (x_ids[i + 1] - x_ids[i]) > field_threshold]
 
-        if last_frame - x_ids[-1] > field_threshold:
-            intervals.append([x_ids[-1] + 1, last_frame])
+        if x_ids[0] > field_threshold:
+            intervals.insert(0, [0, x_ids[0]])
+
+        if self.frames_count - x_ids[-1] > field_threshold:
+            intervals.append([x_ids[-1] + 1, self.frames_count])
 
         for interval in intervals:
             condition = np.logical_and(data[:, 0] >= interval[0], data[:, 0] <= interval[1])
@@ -175,13 +178,16 @@ class AdInsertion(AbstractAdInsertion):
         :param poly_order: the order of the polynomial used to fit the samples
         :return: stable contours amount
         """
-        insertions_amount = self.stable_contours
         for field in self.stable_contours:
             for i in range(1, 9):
                 field[:, i] = savgol_filter(field[:, i], window, poly_order)
 
-        self.stable_contours = np.array([item for sublist in self.stable_contours for item in sublist])
-        return insertions_amount
+        for field in self.stable_contours:
+            self.instance_insertions.append(field[0])
+        self.instance_insertions = np.array(self.instance_insertions)
+
+        self.stable_contours = np.array(self.stable_contours)
+        np.save('files/all_instances.npy', self.stable_contours)
 
     def __transform_logo(self, contours):
         """
@@ -189,7 +195,7 @@ class AdInsertion(AbstractAdInsertion):
         :param contours: contours coordinates for logo transformation
         :return:
         """
-        self.logo = cv.imread(self.logo)
+        self.logo = cv.imread(self.logo, cv.IMREAD_UNCHANGED)
         row = contours[contours[:, 0] == self.frame_idx]
         self.single_cnt = [[row[0][1], row[0][2]], [row[0][3], row[0][4]],
                            [row[0][5], row[0][6]], [row[0][7], row[0][8]]]
@@ -200,7 +206,7 @@ class AdInsertion(AbstractAdInsertion):
         pts2 = np.float32([self.single_cnt[0], self.single_cnt[1], self.single_cnt[2], self.single_cnt[3]])
 
         matrix = cv.getPerspectiveTransform(pts1, pts2)
-        self.logo = cv.warpPerspective(self.logo, matrix, (frame_w, frame_h), borderMode=1)
+        self.logo = cv.warpPerspective(self.logo, matrix, (frame_w, frame_h), borderMode=0)
 
     def build_model(self, filename):
         """
@@ -233,8 +239,7 @@ class AdInsertion(AbstractAdInsertion):
                           cfg['dst_threshold'])
         self.__define_contour_orientation()
         self.__find_insertion_time_period()
-        insertions = self.__smooth_coordinates(cfg['window'], cfg['poly_order'])
-        return insertions
+        self.__smooth_coordinates(cfg['window'], cfg['poly_order'])
 
     def insert_ad(self, contours):
         """
@@ -243,13 +248,21 @@ class AdInsertion(AbstractAdInsertion):
         :return:
         """
         frame_h, frame_w, _ = self.frame.shape
-
         self.__transform_logo(contours)
+        if self.logo.shape[2] == 4:
+            png_mask = self.logo[:, :, 3]
+            bgr_logo = self.logo[:, :, 0:3]
 
-        self.single_cnt = np.array(self.single_cnt)
-        mask = np.zeros((frame_h, frame_w))
-        cv.drawContours(mask, [self.single_cnt], -1, 1, -1)
+            logo_roi = cv.bitwise_and(bgr_logo, bgr_logo, mask=png_mask)
 
-        points = np.argwhere(mask == 1)
-        for i, j in points:
-            self.frame[i, j] = self.logo[i, j]
+            mask_inv = cv.bitwise_not(png_mask)
+            frame_roi = cv.bitwise_and(self.frame, self.frame, mask=mask_inv)
+            self.frame = cv.add(frame_roi, logo_roi)
+        else:
+            self.single_cnt = np.array(self.single_cnt)
+            mask = np.zeros((frame_h, frame_w))
+            cv.drawContours(mask, [self.single_cnt], -1, 1, -1)
+
+            points = np.argwhere(mask == 1)
+            for i, j in points:
+                self.frame[i, j] = self.logo[i, j]

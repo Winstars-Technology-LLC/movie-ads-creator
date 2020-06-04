@@ -1,28 +1,28 @@
-from flask import request, send_from_directory
+from flask import request, send_from_directory, session
 from flask_restx import marshal, Resource
 from werkzeug.utils import secure_filename
 
 from app import app, api
-from ad_insertion_executor import ad_insertion_executor
+from ad_insertion_executor import preprocessing_executor, insertion_executor
 from flask import request
 from flask_restx import marshal, Resource
 
 from app import app, api
 from src import serializers
-from ad_insertion_executor import ad_insertion_executor
+from ad_insertion_executor import preprocessing_executor, insertion_executor
 
 
 @api.route('/conf')
 class ConfigurationResource(Resource):
     @staticmethod
     def get() -> dict:
-        """ Get current model configuration """
+        """ Get Current Model Configuration """
 
         return marshal(app.config['model_config'], serializers.conf_serializer)
 
     @api.expect(serializers.conf_serializer)
     def put(self) -> dict:
-        """ Update model configuration """
+        """ Update Model Configuration """
 
         app.config['model_config'].update(request.get_json())
         app.save_conf()
@@ -34,8 +34,16 @@ class ProcessingResource(Resource):
 
     @api.expect(serializers.processing_serializer)
     def post(self):
-        """ Process new files, return processed video """
+        """ Video Preprocessing """
 
         payload = request.get_json()
-        message = ad_insertion_executor(payload['video_path'], payload['logo_path'], app.conf_path)
+        session['video'] = payload['video']
+        session['logo'] = payload['logo']
+        message = preprocessing_executor(payload['video'], payload['logo'], app.conf_path)
+        return message
+
+    @staticmethod
+    def get() -> dict:
+        """ Advertisement Insertion """
+        message = insertion_executor(session['video'], session['logo'], app.conf_path)
         return message

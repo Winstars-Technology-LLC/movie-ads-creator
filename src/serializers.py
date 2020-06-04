@@ -10,7 +10,7 @@ conf_serializer = api.model(
 processing_serializer = api.model(
     'Processing',
     {
-        'logo_path': fields.String(required=True),
-        'video_path': fields.String(required=True),
+        'logo': fields.String(required=True),
+        'video': fields.String(required=True)
     }
 )
