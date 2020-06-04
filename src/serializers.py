@@ -11,6 +11,6 @@ processing_serializer = api.model(
     'Processing',
     {
         'logo': fields.String(required=True),
-        'video': fields.String(required=True),
+        'video': fields.String(required=True)
     }
 )
