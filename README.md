@@ -41,7 +41,7 @@ To run the mechanism do the following:
 - **To insert advertisement into the video file do the following:**
 1. Run **Video Preprocessing** - choose '**POST**' method, click '**Try it out**', replace **string** in front of **'logo'** and **'video'** with the logo and video file names from **data** folder respectively. Click '**Execute**'. Wait the the execution will be finished. If the execution was successful, you will get instance insertions in **data** folder. You need to check the instances and if you do not like the instance just delete it from the folder.
 
-2. Run Advertisement Insertion - after the instances checking choose '**GET**' method (**Advertisement Insertion**), click '**Try it out**' and '**Execute**'. Wait till the execution will be finished and check the output video file, report and logs in **data** folder.
+2. Run **Advertisement Insertion** - after the instances checking choose '**GET**' method (**Advertisement Insertion**), click '**Try it out**' and '**Execute**'. Wait till the execution will be finished and check the output video file, report and logs in **data** folder.
 
 - To stop the application you need to stop the logs recording and Docker container. Press CTRL+С from the terminal window, then type the following: ```sudo docker container stop dock```;
 
