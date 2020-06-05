@@ -44,7 +44,7 @@ def get_video_info(capture, logo):
     return video_info
 
 
-def preprocessing(capture, video_info, config):
+def find_contours(capture, video_info, config):
     """
     Model preprocessing
     :param capture: video object
@@ -76,7 +76,7 @@ def preprocessing(capture, video_info, config):
     print('Preprocessing completed.')
 
 
-def detection(video_info, config):
+def handle_contours(video_info, config):
     """
     Model detection method
     :param video_info: video info
@@ -123,7 +123,48 @@ def get_instances(video, logo, instances, video_info, config):
     return message
 
 
-def preprocessing_executor(video, logo, config):
+def handle_instances(instances_path):
+    """
+    Handle instances after user checking
+    :param instances_path: instances path
+    :return: all the remaining contours
+    """
+    list_idx = []
+    for filename in os.listdir(instances_path):
+        if filename == '.DS_Store':
+            continue
+        insertion_idx = int(filename.split('.')[0])
+        list_idx.append(insertion_idx)
+
+    all_contours = []
+    stable_contours = np.load('files/all_instances.npy', allow_pickle=True)
+    for i, contour in enumerate(stable_contours):
+        if i in list_idx:
+            for frame_contour in contour:
+                all_contours.append(frame_contour)
+    all_contours = np.array(all_contours)
+    return all_contours
+
+
+def clean_folders(paths):
+    """
+    Clean folders after execution
+    :param paths: folder path
+    :return:
+    """
+    for path in paths:
+        for filename in os.listdir(path):
+            file_path = os.path.join(path, filename)
+            try:
+                if os.path.isfile(file_path) or os.path.islink(file_path):
+                    os.unlink(file_path)
+                elif os.path.isdir(file_path):
+                    shutil.rmtree(file_path)
+            except Exception as e:
+                print('Failed to delete %s. Reason: %s' % (file_path, e))
+
+
+def process_video(video, logo, config):
     """
     Execute AdInsertion model for logo insertion
     :param video: video name
@@ -151,10 +192,10 @@ def preprocessing_executor(video, logo, config):
         video_info['video_name'] = input_video_name
 
         # Preprocessing
-        preprocessing(capture, video_info, config)
+        find_contours(capture, video_info, config)
 
         # Detection
-        instances = detection(video_info, config)
+        instances = handle_contours(video_info, config)
 
         # Get instances
         message = get_instances(output_path + '/' + video,
@@ -163,7 +204,7 @@ def preprocessing_executor(video, logo, config):
     return message
 
 
-def insertion_executor(video, logo, config):
+def insert_ads(video, logo, config):
     """
     Model insertion method
     :param video: video name
@@ -177,20 +218,8 @@ def insertion_executor(video, logo, config):
     instances_path = output_path + '/instances'
 
     if len(os.listdir(files_path)) != 0:
-        list_idx = []
-        for filename in os.listdir(instances_path):
-            if filename == '.DS_Store':
-                continue
-            insertion_idx = int(filename.split('.')[0])
-            list_idx.append(insertion_idx)
 
-        all_contours = []
-        stable_contours = np.load('files/all_instances.npy', allow_pickle=True)
-        for i, contour in enumerate(stable_contours):
-            if i in list_idx:
-                for frame_contour in contour:
-                    all_contours.append(frame_contour)
-        all_contours = np.array(all_contours)
+        all_contours = handle_instances(instances_path)
 
         if len(all_contours) != 0:
             print('Insertion is running...')
@@ -230,16 +259,7 @@ def insertion_executor(video, logo, config):
             print(message)
 
             paths = [files_path, instances_path]
-            for path in paths:
-                for filename in os.listdir(path):
-                    file_path = os.path.join(path, filename)
-                    try:
-                        if os.path.isfile(file_path) or os.path.islink(file_path):
-                            os.unlink(file_path)
-                        elif os.path.isdir(file_path):
-                            shutil.rmtree(file_path)
-                    except Exception as e:
-                        print('Failed to delete %s. Reason: %s' % (file_path, e))
+            clean_folders(paths)
 
         else:
             message = 'There is nothing to insert. Please try different video file.'

@@ -5,6 +5,7 @@ conf_serializer = api.model(
     'Configuration',
     {
         'contour_threshold': fields.Float,
+        'min_area_threshold': fields.Integer
     }
 )
 processing_serializer = api.model(

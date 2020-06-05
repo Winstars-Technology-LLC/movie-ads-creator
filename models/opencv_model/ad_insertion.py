@@ -44,7 +44,7 @@ class AdInsertion(AbstractAdInsertion):
         _, contours, __ = cv.findContours(th, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
 
         drop_list = [i for i in range(len(contours))
-                     if cv.contourArea(contours[i]) / self.square < min_area
+                     if cv.contourArea(contours[i]) < min_area
                      or cv.contourArea(contours[i]) > max_area]
         contours = [i for j, i in enumerate(contours) if j not in drop_list]
 
