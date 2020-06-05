@@ -34,9 +34,9 @@ To run the mechanism do the following:
 
 - While you are working with the application, all the application logs are recorded in **log_file.log** that located in **data** folder. When you stop Docker container, the application will stop working and logs recording will be also stopped. So if you want to check application outputs while it is working just open **log_file.log** from your computer;
 
-- There is an opportunity to set preferable minimum time period for appearing unique logo in video. By default each logo will appear not less than 1.5 seconds. To change time period click '**Put**' method (Update model configuration), click '**Try it out**' and set parameter contour_threshold to the desired value, after that press '**Execute**';
-
 - If you want to check current model configuration, choose '**Get**' method (Get Current Model Configuration), and click '**Try it out**';
+
+- You have an opportunity to set minimum time period for appearing unique logo in video. **By default each logo will appear not less than 1.5 seconds.** You can also change minimum detected contour area. **By default each approved contour has an area not less than 4000 pixels**. To change time period click '**Put**' method (Update model configuration), click '**Try it out**' and set parameters **contour_threshold** and **min_area_threshold** to the desired values, after that press '**Execute**'. **Note that every time you use 'Put' method you have to update both parameters**;
 
 - **To insert advertisement into the video file do the following:**
 1. Run **Video Preprocessing** - choose '**POST**' method, click '**Try it out**', replace **string** in front of **'logo'** and **'video'** with the logo and video file names from **data** folder respectively. Click '**Execute**'. Wait the the execution will be finished. If the execution was successful, you will get instance insertions in **data** folder. You need to check the instances and if you do not like the instance just delete it from the folder.
