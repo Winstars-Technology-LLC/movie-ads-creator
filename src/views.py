@@ -3,13 +3,13 @@ from flask_restx import marshal, Resource
 from werkzeug.utils import secure_filename
 
 from app import app, api
-from ad_insertion_executor import preprocessing_executor, insertion_executor
+from ad_insertion_executor import process_video, insert_ads
 from flask import request
 from flask_restx import marshal, Resource
 
 from app import app, api
 from src import serializers
-from ad_insertion_executor import preprocessing_executor, insertion_executor
+from ad_insertion_executor import process_video, insert_ads
 
 
 @api.route('/conf')
@@ -39,11 +39,11 @@ class ProcessingResource(Resource):
         payload = request.get_json()
         session['video'] = payload['video']
         session['logo'] = payload['logo']
-        message = preprocessing_executor(payload['video'], payload['logo'], app.conf_path)
+        message = process_video(payload['video'], payload['logo'], app.conf_path)
         return message
 
     @staticmethod
     def get() -> dict:
         """ Advertisement Insertion """
-        message = insertion_executor(session['video'], session['logo'], app.conf_path)
+        message = insert_ads(session['video'], session['logo'], app.conf_path)
         return message
