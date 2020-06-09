@@ -21,7 +21,6 @@ class AdInsertion(AbstractAdInsertion):
         self.data = data
         self.frame_idx = frame_idx
         self.video_name = video_info['video_name']
-        self.square = video_info['frame_square']
         self.logo_ratio = video_info['logo_ratio']
         self.frames_count = video_info['frames_count']
         self.instance_insertions = []
